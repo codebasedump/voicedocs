@@ -13,7 +13,6 @@ interface MongooseCache {
 
 // Cache the connection across hot reloads / serverless invocations.
 declare global {
-  // eslint-disable-next-line no-var
   var _voicedocsMongoose: MongooseCache | undefined;
 }
 

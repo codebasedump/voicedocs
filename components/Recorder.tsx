@@ -7,6 +7,34 @@ import { getTemplate } from "@/lib/templates";
 
 const BARS = 40;
 
+// Minimal Web Speech API typings (not part of the standard TS DOM lib).
+interface SpeechResultAlternative {
+  transcript: string;
+}
+interface SpeechRecognitionResultLike {
+  isFinal: boolean;
+  0: SpeechResultAlternative;
+}
+interface SpeechRecognitionEventLike {
+  resultIndex: number;
+  results: ArrayLike<SpeechRecognitionResultLike>;
+}
+interface SpeechRecognitionLike {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((e: SpeechRecognitionEventLike) => void) | null;
+  onerror: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+}
+type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
+interface VoiceWindow {
+  SpeechRecognition?: SpeechRecognitionCtor;
+  webkitSpeechRecognition?: SpeechRecognitionCtor;
+  webkitAudioContext?: typeof AudioContext;
+}
+
 export function Recorder({ templateId }: { templateId: string }) {
   const router = useRouter();
   const tpl = getTemplate(templateId);
@@ -21,7 +49,7 @@ export function Recorder({ templateId }: { templateId: string }) {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const rafRef = useRef<number | null>(null);
-  const recognitionRef = useRef<any>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const barsRef = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -58,7 +86,8 @@ export function Recorder({ templateId }: { templateId: string }) {
       streamRef.current = stream;
 
       // Live waveform via Web Audio analyser
-      const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+      const Ctx =
+        window.AudioContext || (window as unknown as VoiceWindow).webkitAudioContext!;
       const ctx = new Ctx();
       audioCtxRef.current = ctx;
       const source = ctx.createMediaStreamSource(stream);
@@ -69,14 +98,14 @@ export function Recorder({ templateId }: { templateId: string }) {
       drawWaveform();
 
       // Live transcription via Web Speech API (Chrome/Edge/Safari)
-      const SR =
-        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const w = window as unknown as VoiceWindow;
+      const SR = w.SpeechRecognition || w.webkitSpeechRecognition;
       if (SR) {
         const rec = new SR();
         rec.continuous = true;
         rec.interimResults = true;
         rec.lang = "en-AU";
-        rec.onresult = (e: any) => {
+        rec.onresult = (e: SpeechRecognitionEventLike) => {
           let fin = "";
           let int = "";
           for (let i = e.resultIndex; i < e.results.length; i++) {
