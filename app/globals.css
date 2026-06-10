@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+/* Enable class-based dark mode (toggle adds `.dark` on <html>) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================================
+   VoiceDocs design system
+   Brand purple #6C3CE1 · Poppins (UI) · Playfair (display)
+   Semantic surface/text/line tokens flip in dark mode.
+   ============================================================ */
+@theme {
+  /* Brand + status — static in both themes */
+  --color-brand: #6c3ce1;
+  --color-brand-light: #a78bfa;
+  --color-brand-dark: #5b2fcc;
+
+  --color-success: #10b981;
+  --color-success-bg: #ecfdf5;
+  --color-warning: #f59e0b;
+  --color-warning-bg: #fffbeb;
+  --color-danger: #ef4444;
+  --color-danger-bg: #fef2f2;
+  --color-info: #3b82f6;
+  --color-info-bg: #eff6ff;
+  --color-cyan: #06b6d4;
+  --color-cyan-bg: #ecfeff;
+  --color-pink: #ec4899;
+  --color-pink-bg: #fdf2f8;
+
+  /* Always-dark surface for the recording / processing screens */
+  --color-night: #161226;
+
+  /* Theme-aware tokens (resolve to runtime vars below) */
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-line: var(--line);
+  --color-brand-bg: var(--brand-bg);
+
+  /* Poppins everywhere — headings included — for one consistent typeface */
+  --font-sans: "Poppins", system-ui, sans-serif;
+  --font-serif: "Poppins", system-ui, sans-serif;
+
+  --radius-card: 16px;
+  --radius-btn: 10px;
+}
+
+/* Light theme (default) */
+:root {
+  --canvas: #f8f6f3;
+  --surface: #ffffff;
+  --surface-2: #f3f1ee;
+  --ink: #1a1a1a;
+  --line: #e8e4dd;
+  --brand-bg: #f3eeff;
+}
+
+/* Dark theme */
+.dark {
+  --canvas: #0e0c18;
+  --surface: #1a1726;
+  --surface-2: #221d34;
+  --ink: #ece9f5;
+  --line: #2b2740;
+  --brand-bg: #241c44;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+  scroll-padding-top: 80px; /* offset for the sticky nav when jumping to sections */
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Hide scrollbars on horizontal filter rails while keeping scroll */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
